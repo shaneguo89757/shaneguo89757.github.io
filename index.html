@@ -103,7 +103,7 @@
             // Generate info text
             const zodiac = getChineseZodiac(year);
             const weekdayName = getWeekdayName(weekday);
-            document.getElementById('infoText').textContent = `生肖：${zodiac} 星期：${weekdayName}`;
+            document.getElementById('infoText').textContent = `星期${weekdayName}、生肖：${zodiac}、`;
 
             const container = document.getElementById('sequenceContainer');
             container.innerHTML = '';
@@ -136,12 +136,8 @@
             sumRow.className = 'number-row sum-row';
             const sumSequence = [];
             for (let i = 0; i < 12; i++) {
-                const sum = (
-                    (i < 7 ? sequences[0][i] : 0) + 
-                    sequences[1][i] + 
-                    sequences[2][i] - 
-                    (i < 7 ? 3 : 2)
-                ) % 12 + 1;
+                let sum = (i < 7 ? sequences[0][i] : 0) + sequences[1][i] + sequences[2][i];
+                sum = (sum - 1) % 12 + 1;  // Correct calculation: (sum - 1) % 12 + 1
                 sumSequence.push(sum);
                 const cell = document.createElement('div');
                 cell.className = 'number-cell sum-cell';
