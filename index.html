@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日期輸入與數字序列</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .input-container {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        input {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+            width: 80px;
+            text-align: center;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .info-text {
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .number-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .number-cell {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #ddd;
+            margin: 2px;
+            background-color: white;
+        }
+        .separator {
+            width: 100%;
+            height: 2px;
+            background-color: #888;
+            margin: 15px 0;
+        }
+        .sum-row {
+            margin-top: 15px;
+        }
+        .sum-cell {
+            background-color: #e6f3ff;
+        }
+        .repeated {
+            color: red;
+        }
+        .additional-rows {
+            margin-top: 22.5px; /* 1.5 times the usual margin-bottom of .number-row */
+        }
+    </style>
+</head>
+<body>
+    <div class="input-container">
+        <input type="number" id="yearInput" placeholder="西元年" inputmode="numeric" pattern="\d*">
+        <input type="number" id="monthInput" placeholder="月" min="1" max="12" inputmode="numeric" pattern="\d*">
+        <input type="number" id="dayInput" placeholder="日" min="1" max="31" inputmode="numeric" pattern="\d*">
+    </div>
+    <button onclick="generateSequences()">生成序列</button>
+    <div id="infoText" class="info-text"></div>
+    <div id="sequenceContainer"></div>
+    <div id="additionalRowsContainer" class="additional-rows"></div>
+
+    <script>
+        function generateSequences() {
+            const year = parseInt(document.getElementById('yearInput').value);
+            const month = parseInt(document.getElementById('monthInput').value);
+            const day = parseInt(document.getElementById('dayInput').value);
+
+            if (isNaN(year) || isNaN(month) || isNaN(day)) {
+                alert('請輸入有效的日期');
+                return;
+            }
+
+            const date = new Date(year, month - 1, day);
+            const weekday = date.getDay();
+
+            // Generate info text
+            const zodiac = getChineseZodiac(year);
+            const weekdayName = getWeekdayName(weekday);
+            document.getElementById('infoText').textContent = `生肖：${zodiac} 星期：${weekdayName}`;
+
+            const container = document.getElementById('sequenceContainer');
+            container.innerHTML = '';
+
+            const sequences = [
+                getWeekdaySequence(weekday),
+                getSequence(month % 12 + 1),
+                getChineseZodiacSequence(year)
+            ];
+
+            sequences.forEach((seq, index) => {
+                const row = document.createElement('div');
+                row.className = 'number-row';
+                seq.forEach(num => {
+                    const cell = document.createElement('div');
+                    cell.className = 'number-cell';
+                    cell.textContent = num;
+                    row.appendChild(cell);
+                });
+                container.appendChild(row);
+            });
+
+            // Add separator
+            const separator = document.createElement('div');
+            separator.className = 'separator';
+            container.appendChild(separator);
+
+            // Generate sum row
+            const sumRow = document.createElement('div');
+            sumRow.className = 'number-row sum-row';
+            const sumSequence = [];
+            for (let i = 0; i < 12; i++) {
+                const sum = (
+                    (i < 7 ? sequences[0][i] : 0) + 
+                    sequences[1][i] + 
+                    sequences[2][i] - 
+                    (i < 7 ? 3 : 2)
+                ) % 12 + 1;
+                sumSequence.push(sum);
+                const cell = document.createElement('div');
+                cell.className = 'number-cell sum-cell';
+                cell.textContent = sum;
+                sumRow.appendChild(cell);
+            }
+            container.appendChild(sumRow);
+
+            // Highlight repeated numbers
+            const counts = {};
+            sumSequence.forEach(num => {
+                counts[num] = (counts[num] || 0) + 1;
+            });
+            sumRow.childNodes.forEach((cell, index) => {
+                if (counts[sumSequence[index]] >= 2) {
+                    cell.classList.add('repeated');
+                }
+            });
+
+            // Generate additional rows (5th to 10th)
+            const additionalContainer = document.getElementById('additionalRowsContainer');
+            additionalContainer.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('div');
+                row.className = 'number-row';
+                for (let j = 0; j < 12; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'number-cell';
+                    cell.textContent = i * 12 + j + 1;
+                    row.appendChild(cell);
+                }
+                additionalContainer.appendChild(row);
+            }
+        }
+
+        function getWeekdaySequence(weekday) {
+            const sequence = [];
+            for (let i = 0; i < 7; i++) {
+                sequence.push(((weekday + i) % 7) + 1);
+            }
+            return sequence;
+        }
+
+        function getChineseZodiacSequence(year) {
+            const zodiacStartNumber = (year - 1900) % 12 + 1;
+            const sequence = [];
+            for (let i = 0; i < 12; i++) {
+                sequence.push((zodiacStartNumber + i - 1) % 12 + 1);
+            }
+            return sequence;
+        }
+
+        function getSequence(start) {
+            const sequence = [];
+            for (let i = 0; i < 12; i++) {
+                sequence.push((start + i - 1) % 12 + 1);
+            }
+            return sequence;
+        }
+
+        function getChineseZodiac(year) {
+            const zodiac = ['鼠', '牛', '虎', '兔', '龍', '蛇', '馬', '羊', '猴', '雞', '狗', '豬'];
+            return zodiac[(year - 1900) % 12];
+        }
+
+        function getWeekdayName(weekday) {
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            return weekdays[weekday];
+        }
+    </script>
+</body>
+</html>
