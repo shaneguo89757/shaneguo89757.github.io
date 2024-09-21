@@ -200,11 +200,40 @@ function getWeekdayName(weekday) {
 async function captureAndShare() {
     try {
         const captureArea = document.getElementById('captureArea');
-        // 檢查 html2canvas 是否存在
-        if (typeof html2canvas === 'undefined') {
-            throw new Error('html2canvas is not loaded');
-        }
-        const canvas = await html2canvas(captureArea);
+        
+        // 給頁面一些時間來完全渲染
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const canvas = await html2canvas(captureArea, {
+            scale: 2, // 提高圖片質量
+            useCORS: true, // 允許加載跨域圖片
+            logging: true, // 啟用日誌，以便調試
+            onclone: (clonedDoc) => {
+                // 在克隆的文檔中調整樣式
+                const style = clonedDoc.createElement('style');
+                style.innerHTML = `
+                    .number-cell {
+                        display: inline-block !important;
+                        width: 30px !important;
+                        height: 30px !important;
+                        line-height: 30px !important;
+                        text-align: center !important;
+                        margin: 2px !important;
+                        font-size: 14px !important;
+                        border-radius: 4px !important;
+                        background-color: #f1f5f9 !important;
+                    }
+                    .sum-cell { background-color: #dbeafe !important; }
+                    .repeated { color: #dc2626 !important; }
+                    .current-age { 
+                        background-color: #bfdbfe !important;
+                        font-weight: bold !important;
+                    }
+                `;
+                clonedDoc.head.appendChild(style);
+            }
+        });
+
         const imageData = canvas.toDataURL("image/png");
 
         if (navigator.share) {
@@ -221,6 +250,6 @@ async function captureAndShare() {
         }
     } catch (error) {
         console.error('截圖或分享失敗:', error);
-        alert('截圖或分享失敗，請確保瀏覽器支持此功能並允許運行腳本。');
+        alert('截圖或分享失敗，請稍後再試。');
     }
 }
