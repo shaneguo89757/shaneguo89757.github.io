@@ -201,38 +201,58 @@ async function captureAndShare() {
     try {
         const captureArea = document.getElementById('captureArea');
         
+        // 創建一個新的容器來放置克隆的內容
+        const cloneContainer = document.createElement('div');
+        cloneContainer.style.position = 'absolute';
+        cloneContainer.style.left = '-9999px';
+        cloneContainer.style.top = '-9999px';
+        document.body.appendChild(cloneContainer);
+
+        // 克隆捕獲區域的內容
+        const clone = captureArea.cloneNode(true);
+        cloneContainer.appendChild(clone);
+
+        // 應用樣式到克隆的元素
+        const cells = clone.querySelectorAll('.number-cell');
+        cells.forEach(cell => {
+            cell.style.display = 'inline-block';
+            cell.style.width = '30px';
+            cell.style.height = '30px';
+            cell.style.lineHeight = '30px';
+            cell.style.textAlign = 'center';
+            cell.style.margin = '2px';
+            cell.style.fontSize = '14px';
+            cell.style.borderRadius = '4px';
+            cell.style.backgroundColor = '#f1f5f9';
+        });
+
+        const sumCells = clone.querySelectorAll('.sum-cell');
+        sumCells.forEach(cell => {
+            cell.style.backgroundColor = '#dbeafe';
+        });
+
+        const repeatedCells = clone.querySelectorAll('.repeated');
+        repeatedCells.forEach(cell => {
+            cell.style.color = '#dc2626';
+        });
+
+        const currentAgeCells = clone.querySelectorAll('.current-age');
+        currentAgeCells.forEach(cell => {
+            cell.style.backgroundColor = '#bfdbfe';
+            cell.style.fontWeight = 'bold';
+        });
+
         // 給頁面一些時間來完全渲染
         await new Promise(resolve => setTimeout(resolve, 500));
 
-        const canvas = await html2canvas(captureArea, {
+        const canvas = await html2canvas(clone, {
             scale: 2, // 提高圖片質量
             useCORS: true, // 允許加載跨域圖片
             logging: true, // 啟用日誌，以便調試
-            onclone: (clonedDoc) => {
-                // 在克隆的文檔中調整樣式
-                const style = clonedDoc.createElement('style');
-                style.innerHTML = `
-                    .number-cell {
-                        display: inline-block !important;
-                        width: 30px !important;
-                        height: 30px !important;
-                        line-height: 30px !important;
-                        text-align: center !important;
-                        margin: 2px !important;
-                        font-size: 14px !important;
-                        border-radius: 4px !important;
-                        background-color: #f1f5f9 !important;
-                    }
-                    .sum-cell { background-color: #dbeafe !important; }
-                    .repeated { color: #dc2626 !important; }
-                    .current-age { 
-                        background-color: #bfdbfe !important;
-                        font-weight: bold !important;
-                    }
-                `;
-                clonedDoc.head.appendChild(style);
-            }
         });
+
+        // 清理：移除臨時創建的容器
+        document.body.removeChild(cloneContainer);
 
         const imageData = canvas.toDataURL("image/png");
 
