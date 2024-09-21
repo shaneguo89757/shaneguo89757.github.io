@@ -6,139 +6,100 @@
     <title>日期輸入與數字序列</title>
     <style>
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f0f4f8;
-            color: #333;
-        }
-        .container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            max-width: 600px;
-            width: 100%;
+            padding: 20px;
+            background-color: #f0f0f0;
         }
         .input-container {
-            display: flex;
-            justify-content: space-between;
             margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         input {
-            width: 30%;
-            padding: 12px;
+            margin: 5px;
+            padding: 10px;
             font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            width: 80px;
             text-align: center;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        input:focus {
-            outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
         }
         button {
-            width: 100%;
-            padding: 12px;
+            margin: 10px;
+            padding: 10px 20px;
             font-size: 16px;
             background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #45a049;
         }
         .info-text {
-            font-size: 18px;
-            margin: 20px 0;
+            font-size: 14px;
+            margin-bottom: 10px;
             text-align: center;
         }
         .number-row {
             display: flex;
-            justify-content: flex-start;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
         .number-cell {
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 16px;
-            border-radius: 4px;
-            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            margin: 2px;
+            background-color: white;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
-            margin: 4px;
-        }
-        .number-cell:hover {
-            transform: translateY(-2px);
         }
         .separator {
             width: 100%;
             height: 2px;
-            background-color: #ddd;
-            margin: 20px 0;
+            background-color: #888;
+            margin: 15px 0;
         }
         .sum-row {
-            margin-top: 8px;
+            margin-top: 15px;
         }
         .sum-cell {
             background-color: #e6f3ff;
         }
         .repeated {
-            color: #e74c3c;
+            color: red;
         }
         .additional-rows {
-            margin-top: 16px;
+            margin-top: 22.5px;
         }
         .past-age {
-            background-color: #f9f9f9;
-            color: #999;
+            background-color: #F0F0F0;
         }
         .current-age {
-            border: 2px solid #4CAF50;
+            text-decoration: underline;
             font-weight: bold;
+            background-color: #e6f3ff;
         }
         .clicked-1 {
-            background-color: #90EE90;
+            background-color: #90EE90; /* 淺綠色 */
         }
         .clicked-2 {
-            background-color: #FFB6C1;
-        }
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            .number-cell {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
-                margin: 3px;
-            }
+            background-color: #FFB6C1; /* 淺粉紅色 */
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="input-container">
-            <input type="number" id="yearInput" placeholder="西元年" inputmode="numeric" pattern="\d*">
-            <input type="number" id="monthInput" placeholder="月" min="1" max="12" inputmode="numeric" pattern="\d*">
-            <input type="number" id="dayInput" placeholder="日" min="1" max="31" inputmode="numeric" pattern="\d*">
-        </div>
-        <button id="generateButton" onclick="generateSequences()">生成序列</button>
-        <div id="infoText" class="info-text"></div>
-        <div id="sequenceContainer"></div>
-        <div id="additionalRowsContainer" class="additional-rows"></div>
+    <div class="input-container">
+        <input type="number" id="yearInput" placeholder="西元年" inputmode="numeric" pattern="\d*">
+        <input type="number" id="monthInput" placeholder="月" min="1" max="12" inputmode="numeric" pattern="\d*">
+        <input type="number" id="dayInput" placeholder="日" min="1" max="31" inputmode="numeric" pattern="\d*">
     </div>
+    <button id="generateButton" onclick="generateSequences()">生成序列</button>
+    <div id="infoText" class="info-text"></div>
+    <div id="sequenceContainer"></div>
+    <div id="additionalRowsContainer" class="additional-rows"></div>
 
     <script>
         document.getElementById('yearInput').oninput = function() {
@@ -209,7 +170,7 @@
 
             const sequences = [
                 getWeekdaySequence(weekday),
-                getSequence(month),
+                getSequence(month % 12 + 1),
                 getChineseZodiacSequence(year)
             ];
 
@@ -235,10 +196,8 @@
             const sumRow = document.createElement('div');
             sumRow.className = 'number-row sum-row';
             const sumSequence = [];
-            for (let i = 0; i < Math.max(sequences[0].length, sequences[1].length, sequences[2].length); i++) {
-                let sum = (i < sequences[0].length ? sequences[0][i] : 0) +
-                          (i < sequences[1].length ? sequences[1][i] : 0) +
-                          (i < sequences[2].length ? sequences[2][i] : 0);
+            for (let i = 0; i < 12; i++) {
+                let sum = (i < 7 ? sequences[0][i] : 0) + sequences[1][i] + sequences[2][i];
                 sum = (sum - 1) % 12 + 1;
                 sumSequence.push(sum);
                 const cell = document.createElement('div');
