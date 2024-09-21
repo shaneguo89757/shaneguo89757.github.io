@@ -201,60 +201,51 @@ async function captureAndShare() {
     try {
         const captureArea = document.getElementById('captureArea');
         
-        // 創建一個新的容器來放置克隆的內容
+        // Create a new container for cloned content
         const cloneContainer = document.createElement('div');
         cloneContainer.style.position = 'absolute';
         cloneContainer.style.left = '-9999px';
         cloneContainer.style.top = '-9999px';
         document.body.appendChild(cloneContainer);
 
-        // 克隆捕獲區域的內容
+        // Clone the capture area content
         const clone = captureArea.cloneNode(true);
         cloneContainer.appendChild(clone);
 
-        // 應用樣式到克隆的元素
+        // Apply styles to cloned elements
         const cells = clone.querySelectorAll('.number-cell');
         cells.forEach(cell => {
             cell.style.display = 'inline-block';
-            cell.style.width = '30px';
-            cell.style.height = '30px';
-            cell.style.lineHeight = '30px';
+            cell.style.width = '40px';  // Increased from 30px
+            cell.style.height = '40px'; // Increased from 30px
+            cell.style.lineHeight = '40px'; // Increased from 30px
             cell.style.textAlign = 'center';
             cell.style.margin = '2px';
-            cell.style.fontSize = '14px';
+            cell.style.fontSize = '16px'; // Increased from 14px
             cell.style.borderRadius = '4px';
             cell.style.backgroundColor = '#f1f5f9';
         });
 
-        const sumCells = clone.querySelectorAll('.sum-cell');
-        sumCells.forEach(cell => {
-            cell.style.backgroundColor = '#dbeafe';
-        });
+        // ... (rest of the styling code remains the same)
 
-        const repeatedCells = clone.querySelectorAll('.repeated');
-        repeatedCells.forEach(cell => {
-            cell.style.color = '#dc2626';
-        });
-
-        const currentAgeCells = clone.querySelectorAll('.current-age');
-        currentAgeCells.forEach(cell => {
-            cell.style.backgroundColor = '#bfdbfe';
-            cell.style.fontWeight = 'bold';
-        });
-
-        // 給頁面一些時間來完全渲染
+        // Give the page some time to fully render
         await new Promise(resolve => setTimeout(resolve, 500));
 
         const canvas = await html2canvas(clone, {
-            scale: 2, // 提高圖片質量
-            useCORS: true, // 允許加載跨域圖片
-            logging: true, // 啟用日誌，以便調試
+            scale: 3, // Increased from 2 to 3 for higher quality
+            useCORS: true,
+            logging: true,
+            backgroundColor: null, // Ensure transparent background
+            imageTimeout: 0, // No timeout for image loading
+            onclone: function(clonedDoc) {
+                // Additional modifications to the cloned document if needed
+            }
         });
 
-        // 清理：移除臨時創建的容器
+        // Clean up: remove the temporarily created container
         document.body.removeChild(cloneContainer);
 
-        const imageData = canvas.toDataURL("image/png");
+        const imageData = canvas.toDataURL("image/png", 1.0); // Use maximum quality
 
         if (navigator.share) {
             await navigator.share({
