@@ -200,6 +200,10 @@ function getWeekdayName(weekday) {
 async function captureAndShare() {
     try {
         const captureArea = document.getElementById('captureArea');
+        // 檢查 html2canvas 是否存在
+        if (typeof html2canvas === 'undefined') {
+            throw new Error('html2canvas is not loaded');
+        }
         const canvas = await html2canvas(captureArea);
         const imageData = canvas.toDataURL("image/png");
 
@@ -217,6 +221,6 @@ async function captureAndShare() {
         }
     } catch (error) {
         console.error('截圖或分享失敗:', error);
-        alert('截圖或分享失敗，請稍後再試。');
+        alert('截圖或分享失敗，請確保瀏覽器支持此功能並允許運行腳本。');
     }
 }
