@@ -8,33 +8,39 @@
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 10px;
-            background-color: #f7f9fc;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f4f8;
             color: #333;
         }
         .container {
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 15px;
-            max-width: 100%;
+            padding: 30px;
+            max-width: 600px;
             width: 100%;
-            box-sizing: border-box;
         }
         .input-container {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         input {
             width: 30%;
-            padding: 10px 5px;
+            padding: 12px;
             font-size: 16px;
             border: 1px solid #ddd;
             border-radius: 6px;
             text-align: center;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
         }
         button {
             width: 100%;
@@ -45,41 +51,54 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            margin-bottom: 15px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
         }
         .info-text {
-            font-size: 16px;
-            margin: 15px 0;
+            font-size: 18px;
+            margin: 20px 0;
             text-align: center;
         }
-        .number-container {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 4px;
-            margin-top: 15px;
+        .number-row {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 8px;
         }
         .number-cell {
-            aspect-ratio: 1;
+            width: 40px;
+            height: 40px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 14px;
+            font-size: 16px;
             border-radius: 4px;
             background-color: #f0f0f0;
-            padding: 2px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            margin: 4px;
+        }
+        .number-cell:hover {
+            transform: translateY(-2px);
         }
         .separator {
             width: 100%;
-            height: 1px;
+            height: 2px;
             background-color: #ddd;
-            margin: 15px 0;
+            margin: 20px 0;
+        }
+        .sum-row {
+            margin-top: 8px;
         }
         .sum-cell {
             background-color: #e6f3ff;
         }
         .repeated {
             color: #e74c3c;
-            font-weight: bold;
+        }
+        .additional-rows {
+            margin-top: 16px;
         }
         .past-age {
             background-color: #f9f9f9;
@@ -88,7 +107,6 @@
         .current-age {
             border: 2px solid #4CAF50;
             font-weight: bold;
-            background-color: #e6f3ff;
         }
         .clicked-1 {
             background-color: #90EE90;
@@ -96,16 +114,15 @@
         .clicked-2 {
             background-color: #FFB6C1;
         }
-        @media (min-width: 768px) {
+        @media (max-width: 600px) {
             .container {
                 padding: 20px;
             }
             .number-cell {
-                font-size: 16px;
-                padding: 4px;
-            }
-            .number-container {
-                gap: 6px;
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+                margin: 3px;
             }
         }
     </style>
@@ -119,9 +136,8 @@
         </div>
         <button id="generateButton" onclick="generateSequences()">生成序列</button>
         <div id="infoText" class="info-text"></div>
-        <div id="sequenceContainer" class="number-container"></div>
-        <div class="separator"></div>
-        <div id="additionalRowsContainer" class="number-container"></div>
+        <div id="sequenceContainer"></div>
+        <div id="additionalRowsContainer" class="additional-rows"></div>
     </div>
 
     <script>
@@ -198,16 +214,26 @@
             ];
 
             sequences.forEach((seq, index) => {
+                const row = document.createElement('div');
+                row.className = 'number-row';
                 seq.forEach(num => {
                     const cell = document.createElement('div');
                     cell.className = 'number-cell';
                     cell.textContent = num;
                     cell.onclick = cycleColors;
-                    container.appendChild(cell);
+                    row.appendChild(cell);
                 });
+                container.appendChild(row);
             });
 
+            // Add separator
+            const separator = document.createElement('div');
+            separator.className = 'separator';
+            container.appendChild(separator);
+
             // Generate sum row
+            const sumRow = document.createElement('div');
+            sumRow.className = 'number-row sum-row';
             const sumSequence = [];
             for (let i = 0; i < 12; i++) {
                 let sum = (i < 7 ? sequences[0][i] : 0) + sequences[1][i] + sequences[2][i];
@@ -217,15 +243,16 @@
                 cell.className = 'number-cell sum-cell';
                 cell.textContent = sum;
                 cell.onclick = cycleColors;
-                container.appendChild(cell);
+                sumRow.appendChild(cell);
             }
+            container.appendChild(sumRow);
 
             // Highlight repeated numbers
             const counts = {};
             sumSequence.forEach(num => {
                 counts[num] = (counts[num] || 0) + 1;
             });
-            container.querySelectorAll('.sum-cell').forEach((cell, index) => {
+            sumRow.childNodes.forEach((cell, index) => {
                 if (counts[sumSequence[index]] >= 2) {
                     cell.classList.add('repeated');
                 }
@@ -235,6 +262,8 @@
             const additionalContainer = document.getElementById('additionalRowsContainer');
             additionalContainer.innerHTML = '';
             for (let i = 0; i < 6; i++) {
+                const row = document.createElement('div');
+                row.className = 'number-row';
                 for (let j = 0; j < 12; j++) {
                     const cell = document.createElement('div');
                     cell.className = 'number-cell';
@@ -246,8 +275,9 @@
                         cell.classList.add('past-age');
                     }
                     cell.onclick = cycleColors;
-                    additionalContainer.appendChild(cell);
+                    row.appendChild(cell);
                 }
+                additionalContainer.appendChild(row);
             }
         }
 
