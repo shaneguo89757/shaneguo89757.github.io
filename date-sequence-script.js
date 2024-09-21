@@ -212,31 +212,50 @@ async function captureAndShare() {
         const clone = captureArea.cloneNode(true);
         cloneContainer.appendChild(clone);
 
-        // Apply styles to cloned elements
+        // Replace number cells with SVG
         const cells = clone.querySelectorAll('.number-cell');
         cells.forEach(cell => {
-            cell.style.display = 'inline-block';
-            cell.style.width = '40px';  // Increased from 30px
-            cell.style.height = '40px'; // Increased from 30px
-            cell.style.lineHeight = '40px'; // Increased from 30px
-            cell.style.textAlign = 'center';
-            cell.style.margin = '2px';
-            cell.style.fontSize = '16px'; // Increased from 14px
-            cell.style.borderRadius = '4px';
-            cell.style.backgroundColor = '#f1f5f9';
+            const svgns = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgns, "svg");
+            svg.setAttribute('width', '40');
+            svg.setAttribute('height', '40');
+            svg.setAttribute('viewBox', '0 0 40 40');
+
+            const rect = document.createElementNS(svgns, 'rect');
+            rect.setAttribute('width', '40');
+            rect.setAttribute('height', '40');
+            rect.setAttribute('fill', '#f1f5f9');
+            rect.setAttribute('rx', '4');
+            svg.appendChild(rect);
+
+            const text = document.createElementNS(svgns, 'text');
+            text.setAttribute('x', '20');
+            text.setAttribute('y', '24');
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('font-size', '16');
+            text.setAttribute('fill', '#000');
+            text.textContent = cell.textContent;
+            svg.appendChild(text);
+
+            cell.innerHTML = '';
+            cell.appendChild(svg);
         });
 
-        // ... (rest of the styling code remains the same)
+        // Adjust styles for SVG containers
+        cells.forEach(cell => {
+            cell.style.display = 'inline-block';
+            cell.style.margin = '2px';
+        });
 
         // Give the page some time to fully render
         await new Promise(resolve => setTimeout(resolve, 500));
 
         const canvas = await html2canvas(clone, {
-            scale: 3, // Increased from 2 to 3 for higher quality
+            scale: 3,
             useCORS: true,
             logging: true,
-            backgroundColor: null, // Ensure transparent background
-            imageTimeout: 0, // No timeout for image loading
+            backgroundColor: null,
+            imageTimeout: 0,
             onclone: function(clonedDoc) {
                 // Additional modifications to the cloned document if needed
             }
@@ -245,7 +264,7 @@ async function captureAndShare() {
         // Clean up: remove the temporarily created container
         document.body.removeChild(cloneContainer);
 
-        const imageData = canvas.toDataURL("image/png", 1.0); // Use maximum quality
+        const imageData = canvas.toDataURL("image/png", 1.0);
 
         if (navigator.share) {
             await navigator.share({
