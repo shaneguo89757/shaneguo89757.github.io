@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>日期序列生成器</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -15,45 +15,45 @@
             background-color: white;
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            padding: 30px;
+            padding: 20px;
             width: 100%;
             max-width: 1200px;
-            margin: 20px auto;
+            margin: 10px auto;
             overflow-x: auto;
         }
         .number-row {
             display: flex;
             justify-content: flex-start;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             min-width: max-content;
         }
         .number-cell {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             flex: 0 0 auto;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 8px;
-            margin-right: 4px;
+            border-radius: 6px;
+            margin-right: 3px;
             background-color: #f1f5f9;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             color: #334155;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         .number-cell:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             background-color: #e2e8f0;
         }
         .separator {
             width: 100%;
-            height: 2px;
+            height: 1px;
             background-color: #e2e8f0;
-            margin: 20px 0;
+            margin: 15px 0;
         }
         .sum-cell {
             background-color: #dbeafe;
@@ -103,24 +103,46 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+        @media (max-width: 640px) {
+            .card {
+                padding: 15px;
+                margin: 5px auto;
+            }
+            .number-cell {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+                margin-right: 2px;
+            }
+            input[type="number"] {
+                font-size: 16px;
+            }
+            #generateButton {
+                font-size: 16px;
+                padding: 10px;
+            }
+            #infoText {
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body class="font-sans">
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-2 py-4">
         <div class="card">
-            <div class="flex justify-center mb-8">
-                <input type="number" id="yearInput" placeholder="西元年" class="m-2 p-3 rounded-lg w-36 text-center text-xl focus:outline-none" inputmode="numeric" pattern="\d*">
-                <input type="number" id="monthInput" placeholder="月" min="1" max="12" class="m-2 p-3 rounded-lg w-28 text-center text-xl focus:outline-none" inputmode="numeric" pattern="\d*">
-                <input type="number" id="dayInput" placeholder="日" min="1" max="31" class="m-2 p-3 rounded-lg w-28 text-center text-xl focus:outline-none" inputmode="numeric" pattern="\d*">
+            <div class="flex flex-wrap justify-center mb-4">
+                <input type="number" id="yearInput" placeholder="西元年" class="m-1 p-2 rounded-lg w-28 text-center text-lg focus:outline-none" inputmode="numeric" pattern="\d*">
+                <input type="number" id="monthInput" placeholder="月" min="1" max="12" class="m-1 p-2 rounded-lg w-20 text-center text-lg focus:outline-none" inputmode="numeric" pattern="\d*">
+                <input type="number" id="dayInput" placeholder="日" min="1" max="31" class="m-1 p-2 rounded-lg w-20 text-center text-lg focus:outline-none" inputmode="numeric" pattern="\d*">
             </div>
             
-            <button id="generateButton" onclick="generateSequences()" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg text-xl font-semibold hover:bg-indigo-700 transition duration-300">生成序列</button>
+            <button id="generateButton" onclick="generateSequences()" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition duration-300">生成序列</button>
             
-            <div id="infoText" class="text-center text-gray-600 mt-8 mb-8 text-xl"></div>
+            <div id="infoText" class="text-center text-gray-600 mt-4 mb-4 text-lg"></div>
             
-            <div id="sequenceContainer" class="mt-8"></div>
+            <div id="sequenceContainer" class="mt-4"></div>
             
-            <div id="additionalRowsContainer" class="mt-8"></div>
+            <div id="additionalRowsContainer" class="mt-4"></div>
         </div>
     </div>
 
@@ -130,7 +152,7 @@
                 document.getElementById('monthInput').focus();
             }
         };
-
+        
         document.getElementById('monthInput').oninput = function() {
             let value = this.value;
             
@@ -145,13 +167,13 @@
                 document.getElementById('dayInput').focus();
             }
         };
-
+        
         document.getElementById('dayInput').oninput = function() {
             let value = this.value;
             let month = document.getElementById('monthInput').value;
             let year = document.getElementById('yearInput').value;
             let maxDays = new Date(year, month, 0).getDate();
-
+        
             if (value.length === 1 && value >= '1' && value <= '9') {
                 setTimeout(() => {
                     if (this.value.length === 1) {
@@ -165,34 +187,34 @@
                 document.getElementById('generateButton').focus();
             }
         };
-
+        
         function generateSequences() {
             const year = parseInt(document.getElementById('yearInput').value);
             const month = parseInt(document.getElementById('monthInput').value);
             const day = parseInt(document.getElementById('dayInput').value);
-
+        
             if (isNaN(year) || isNaN(month) || isNaN(day)) {
                 alert('請輸入有效的日期');
                 return;
             }
-
+        
             const birthDate = new Date(year, month - 1, day);
             const currentDate = new Date();
             const weekday = birthDate.getDay();
-
+        
             const zodiac = getChineseZodiac(year);
             const weekdayName = getWeekdayName(weekday);
             document.getElementById('infoText').textContent = `星期${weekdayName}、生肖：${zodiac}`;
-
+        
             const container = document.getElementById('sequenceContainer');
             container.innerHTML = '';
-
+        
             const sequences = [
                 getWeekdaySequence(weekday),
                 getSequence(month%12+1),
                 getChineseZodiacSequence(year)
             ];
-
+        
             sequences.forEach((seq, index) => {
                 const row = document.createElement('div');
                 row.className = 'number-row';
@@ -205,12 +227,12 @@
                 });
                 container.appendChild(row);
             });
-
+        
             // Add separator
             const separator = document.createElement('div');
             separator.className = 'separator';
             container.appendChild(separator);
-
+        
             // Generate sum row
             const sumRow = document.createElement('div');
             sumRow.className = 'number-row';
@@ -226,7 +248,7 @@
                 sumRow.appendChild(cell);
             }
             container.appendChild(sumRow);
-
+        
             // Highlight repeated numbers
             const counts = {};
             sumSequence.forEach(num => {
@@ -237,7 +259,7 @@
                     cell.classList.add('repeated');
                 }
             });
-
+        
             // Generate additional rows
             const additionalContainer = document.getElementById('additionalRowsContainer');
             additionalContainer.innerHTML = '';
@@ -260,12 +282,12 @@
                 }
                 additionalContainer.appendChild(row);
             }
-
+        
             // Add fade-in effect
             container.classList.add('fade-in');
             additionalContainer.classList.add('fade-in');
         }
-
+        
         function cycleColors() {
             if (!this.classList.contains('clicked-1') && !this.classList.contains('clicked-2')) {
                 this.classList.add('clicked-1');
@@ -276,7 +298,7 @@
                 this.classList.remove('clicked-2');
             }
         }
-
+        
         function calculateAge(birthDate, currentDate) {
             let age = currentDate.getFullYear() - birthDate.getFullYear();
             const monthDiff = currentDate.getMonth() - birthDate.getMonth();
@@ -285,7 +307,7 @@
             }
             return age + 1;
         }
-
+        
         function getWeekdaySequence(weekday) {
             const sequence = [];
             for (let i = 0; i < 7; i++) {
@@ -293,7 +315,7 @@
             }
             return sequence;
         }
-
+        
         function getChineseZodiacSequence(year) {
             const zodiacStartNumber = (year - 1900) % 12;
             const sequence = [];
@@ -302,7 +324,7 @@
             }
             return sequence;
         }
-
+        
         function getSequence(start) {
             const sequence = [];
             for (let i = 0; i < 12; i++) {
@@ -310,16 +332,16 @@
             }
             return sequence;
         }
-
+        
         function getChineseZodiac(year) {
             const zodiac = ['鼠', '牛', '虎', '兔', '龍', '蛇', '馬', '羊', '猴', '雞', '狗', '豬'];
             return zodiac[(year - 1900) % 12];
         }
-
+        
         function getWeekdayName(weekday) {
             const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
             return weekdays[weekday];
         }
-    </script>
+        </script>
 </body>
 </html>
