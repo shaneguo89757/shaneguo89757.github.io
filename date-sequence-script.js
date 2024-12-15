@@ -102,6 +102,11 @@ function generateSequences() {
     }
     container.appendChild(sumRow);
 
+    // 在上面的 sumSequence 計算完後，使用同一個陣列
+    const gridContainer = document.getElementById('gridContainer');
+    container.innerHTML = ''; // 清空容器
+    container.appendChild(createGrid12x12(sumSequence));
+
     // Highlight repeated numbers
     const counts = {};
     sumSequence.forEach(num => {
@@ -139,6 +144,12 @@ function generateSequences() {
     // Add fade-in effect
     container.classList.add('fade-in');
     additionalContainer.classList.add('fade-in');
+
+    for (let i = 0; i < 12; i++) {
+        let sum = (i < 7 ? sequences[0][i] : 0) + sequences[1][i] + sequences[2][i];
+        sum = (sum - 1) % 12 + 1;
+        sumSequence.push(sum);
+    }
 }
 
 function cycleColors() {
@@ -282,4 +293,41 @@ async function captureAndShare() {
         console.error('截圖或分享失敗:', error);
         alert('截圖或分享失敗，請稍後再試。');
     }
+}
+
+// 在 date-sequence-script.js 中添加以下函數
+function createGrid12x12(sumSequence) {
+    const gridContainer = document.createElement('div');
+    gridContainer.className = 'w-full overflow-x-auto mt-8';
+    
+    const grid = document.createElement('div');
+    grid.className = 'inline-block min-w-full';
+    
+    const gridInner = document.createElement('div');
+    gridInner.className = 'grid grid-cols-12 gap-1';
+    gridInner.style.display = 'grid';
+    gridInner.style.gridTemplateColumns = 'repeat(12, minmax(0, 1fr))';
+    gridInner.style.gap = '0.25rem';
+
+    // 創建 12x12 網格
+    for (let row = 0; row < 12; row++) {
+        for (let col = 0; col < 12; col++) {
+            const cell = document.createElement('div');
+            cell.className = 'w-8 h-8 flex items-center justify-center bg-gray-50 rounded relative';
+            
+            // 檢查是否需要在這個位置放置點
+            if (sumSequence[col] === row + 1) {
+                const dot = document.createElement('div');
+                dot.className = 'absolute w-3 h-3 bg-blue-600 rounded-full';
+                cell.appendChild(dot);
+            }
+            
+            gridInner.appendChild(cell);
+        }
+    }
+    
+    grid.appendChild(gridInner);
+    gridContainer.appendChild(grid);
+    
+    return gridContainer;
 }
