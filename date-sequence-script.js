@@ -68,7 +68,6 @@ function generateSequences() {
         getChineseZodiacSequence(year)
     ];
 
-    // 創建前三行
     sequences.forEach((seq, index) => {
         const row = document.createElement('div');
         row.className = 'number-row';
@@ -91,8 +90,6 @@ function generateSequences() {
     const sumRow = document.createElement('div');
     sumRow.className = 'number-row';
     const sumSequence = [];
-    
-    // 重新計算和顯示第四行
     for (let i = 0; i < 12; i++) {
         let sum = (i < 7 ? sequences[0][i] : 0) + sequences[1][i] + sequences[2][i];
         sum = (sum - 1) % 12 + 1;
@@ -105,7 +102,20 @@ function generateSequences() {
     }
     container.appendChild(sumRow);
 
-    // 產生額外的行（年齡表）
+    
+
+    // Highlight repeated numbers
+    const counts = {};
+    sumSequence.forEach(num => {
+        counts[num] = (counts[num] || 0) + 1;
+    });
+    sumRow.childNodes.forEach((cell, index) => {
+        if (counts[sumSequence[index]] >= 2) {
+            cell.classList.add('repeated');
+        }
+    });
+
+    // Generate additional rows
     const additionalContainer = document.getElementById('additionalRowsContainer');
     additionalContainer.innerHTML = '';
     const age = calculateAge(birthDate, currentDate);
@@ -128,53 +138,20 @@ function generateSequences() {
         additionalContainer.appendChild(row);
     }
 
-    // 在最下方創建網格
-    const gridContainer = document.getElementById('gridContainer');
-    gridContainer.innerHTML = '';
-    
-    const gridWrapper = document.createElement('div');
-    gridWrapper.className = 'w-full overflow-x-auto mt-8';
-    
-    const gridInner = document.createElement('div');
-    gridInner.className = 'grid grid-cols-12 gap-1 bg-gray-50 p-4 rounded-lg';
-    gridInner.style.display = 'grid';
-    gridInner.style.gridTemplateColumns = 'repeat(12, minmax(32px, 1fr))';
-    
-    // 創建 12x12 網格
-    for (let row = 11; row >= 0; row--) {  // 從上到下遍歷，反轉 Y 軸
-        for (let col = 0; col < 12; col++) {
-            const cell = document.createElement('div');
-            cell.className = 'aspect-square flex items-center justify-center bg-white rounded relative';
-            
-            // 檢查是否需要在這個位置放置點
-            if (sumSequence[col] === row + 1) {
-                const dot = document.createElement('div');
-                dot.className = 'absolute w-2 h-2 bg-blue-600 rounded-full';
-                cell.appendChild(dot);
-            }
-            
-            gridInner.appendChild(cell);
-        }
-    }
-    
-    // 添加 X 軸標籤
-    const xLabels = document.createElement('div');
-    xLabels.className = 'grid grid-cols-12 gap-1 mt-2 text-xs text-gray-500';
-    for (let i = 0; i < 12; i++) {
-        const label = document.createElement('div');
-        label.className = 'text-center';
-        label.textContent = i + 1;
-        xLabels.appendChild(label);
-    }
-    
-    gridWrapper.appendChild(gridInner);
-    gridWrapper.appendChild(xLabels);
-    gridContainer.appendChild(gridWrapper);
-
     // Add fade-in effect
     container.classList.add('fade-in');
     additionalContainer.classList.add('fade-in');
-    gridContainer.classList.add('fade-in');
+
+    for (let i = 0; i < 12; i++) {
+        let sum = (i < 7 ? sequences[0][i] : 0) + sequences[1][i] + sequences[2][i];
+        sum = (sum - 1) % 12 + 1;
+        sumSequence.push(sum);
+    }
+
+    // 在上面的 sumSequence 計算完後，使用同一個陣列
+    const gridContainer = document.getElementById('gridContainer');
+    container.innerHTML = ''; // 清空容器
+    container.appendChild(createGrid12x12(sumSequence));
 }
 
 function cycleColors() {
