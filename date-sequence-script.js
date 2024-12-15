@@ -14,7 +14,7 @@ document.getElementById('monthInput').oninput = function() {
                 this.value = '0' + this.value;
                 document.getElementById('dayInput').focus();
             }
-        }, 300);
+        }, 1000); //切換時間
     } else if (value.length === 2 && value >= '01' && value <= '12') {
         document.getElementById('dayInput').focus();
     }
@@ -34,7 +34,7 @@ document.getElementById('dayInput').oninput = function() {
                     document.getElementById('generateButton').focus();
                 }
             }
-        }, 300);
+        }, 1000); //切換時間
     } else if (value.length === 2 && parseInt(value) >= 1 && parseInt(value) <= maxDays) {
         document.getElementById('generateButton').focus();
     }
