@@ -212,7 +212,7 @@ function generateSequences() {
                 for (let i = 0; i < points.length - 1; i++) {
                     const horizontalLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                     horizontalLine.setAttribute('d', `M${points[i].x},${y} L${points[i + 1].x},${y}`);
-                    horizontalLine.setAttribute('stroke', '#ef4444'); // 使用紅色來區分
+                    horizontalLine.setAttribute('stroke', 'rgba(239, 68, 68, 0.53)'); // 使用紅色來區分
                     horizontalLine.setAttribute('stroke-width', '2');
                     horizontalLine.setAttribute('stroke-dasharray', '4,4'); // 虛線效果
                     svg.appendChild(horizontalLine);
@@ -279,26 +279,45 @@ function generateSequences() {
 
     // 在添加點的部分之後，加上標籤
     points.forEach(({ x, y }, index) => {
+        const number = startNumber + index;
+        const isCurrentAge = number === currentAge;
+        
         // 先畫點
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', x);
         circle.setAttribute('cy', y);
-        circle.setAttribute('r', '4');
-        circle.setAttribute('fill', '#2563eb');
+        
+        if (isCurrentAge) {
+            // 當前年齡的點樣式
+            circle.setAttribute('r', '6');  // 更大的點
+            circle.setAttribute('fill', '#ef4444');  // 紅色
+            // 添加光暈效果
+            const glow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            glow.setAttribute('cx', x);
+            glow.setAttribute('cy', y);
+            glow.setAttribute('r', '12');
+            glow.setAttribute('fill', 'none');
+            glow.setAttribute('stroke', '#ef4444');
+            glow.setAttribute('stroke-width', '2');
+            glow.setAttribute('opacity', '0.3');
+            svg.appendChild(glow);
+        } else {
+            // 普通點的樣式
+            circle.setAttribute('r', '4');
+            circle.setAttribute('fill', '#2563eb');
+        }
         svg.appendChild(circle);
-
-        // 添加數字標籤
+    
+        // 添加標籤
         const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        const number = startNumber + index; // 計算對應的數字
-
-        // 根據點的位置調整標籤位置，避免重疊
-        let labelX = x + 10; // 默認在點的右側
-        let labelY = y - 5;  // 默認在點的上方
+        let labelX = x + 10;
+        let labelY = y - 5;
         
         label.setAttribute('x', labelX);
         label.setAttribute('y', labelY);
-        label.setAttribute('fill', '#2563eb');
-        label.setAttribute('font-size', '12');
+        label.setAttribute('fill', isCurrentAge ? '#ef4444' : '#2563eb');  // 當前年齡的標籤也用紅色
+        label.setAttribute('font-size', isCurrentAge ? '14' : '12');  // 當前年齡的標籤字體更大
+        label.setAttribute('font-weight', isCurrentAge ? 'bold' : 'normal');  // 當前年齡的標籤加粗
         label.setAttribute('text-anchor', 'start');
         label.textContent = number;
         svg.appendChild(label);
