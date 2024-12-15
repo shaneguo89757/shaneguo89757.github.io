@@ -102,10 +102,7 @@ function generateSequences() {
     }
     container.appendChild(sumRow);
 
-    // 在上面的 sumSequence 計算完後，使用同一個陣列
-    const gridContainer = document.getElementById('gridContainer');
-    container.innerHTML = ''; // 清空容器
-    container.appendChild(createGrid12x12(sumSequence));
+    
 
     // Highlight repeated numbers
     const counts = {};
@@ -150,6 +147,11 @@ function generateSequences() {
         sum = (sum - 1) % 12 + 1;
         sumSequence.push(sum);
     }
+
+    // 在上面的 sumSequence 計算完後，使用同一個陣列
+    const gridContainer = document.getElementById('gridContainer');
+    container.innerHTML = ''; // 清空容器
+    container.appendChild(createGrid12x12(sumSequence));
 }
 
 function cycleColors() {
