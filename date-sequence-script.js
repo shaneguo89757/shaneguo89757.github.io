@@ -236,16 +236,6 @@ function generateSequences() {
     // 添加水平連線
     findAndDrawHorizontalConnections();
 
-    // 添加點（確保點在最上層）
-    points.forEach(({ x, y }) => {
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', x);
-        circle.setAttribute('cy', y);
-        circle.setAttribute('r', '4');
-        circle.setAttribute('fill', '#2563eb');
-        svg.appendChild(circle);
-    });
-
     gridContainer.appendChild(svg);
 
     // 添加 Y 軸刻度（從下往上 1-12）
@@ -281,6 +271,7 @@ function generateSequences() {
     points.forEach(({ x, y }, index) => {
         const number = startNumber + index;
         const isCurrentAge = number === currentAge;
+        const isLastPoint = index === points.length - 1;  // 檢查是否是最後一個點
         
         // 先畫點
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -310,12 +301,13 @@ function generateSequences() {
     
         // 添加標籤
         const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        let labelX = x + 10;
-        let labelY = y - 5;
+        let labelX = isLastPoint ? x : x + 15;  // 如果是最後一個點，X 座標與點對齊
+        let labelY = isLastPoint ? y - 15 : y - 5;  // 如果是最後一個點，向上偏移更多
         
         label.setAttribute('x', labelX);
         label.setAttribute('y', labelY);
         label.setAttribute('fill', isCurrentAge ? '#ef4444' : '#2563eb');  // 當前年齡的標籤也用紅色
+        label.setAttribute('text-decoration', isCurrentAge ? 'underline': '');
         label.setAttribute('font-size', isCurrentAge ? '14' : '12');  // 當前年齡的標籤字體更大
         label.setAttribute('font-weight', isCurrentAge ? 'bold' : 'normal');  // 當前年齡的標籤加粗
         label.setAttribute('text-anchor', 'start');
