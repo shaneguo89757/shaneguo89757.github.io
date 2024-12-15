@@ -136,6 +136,118 @@ function generateSequences() {
         additionalContainer.appendChild(row);
     }
 
+    // ====在最下方創建網格====
+    // 創建網格的 SVG
+    const gridContainer = document.getElementById('gridContainer');
+    gridContainer.innerHTML = '';
+
+    // 獲取實際的 number-cell 尺寸和間距
+    const numberCell = document.querySelector('.number-cell');
+    const numberRow = document.querySelector('.number-row');
+    const computedStyle = window.getComputedStyle(numberCell);
+    const cellMargin = parseFloat(computedStyle.marginRight);
+    
+    // 計算精確的尺寸
+    const CELL_SIZE = numberCell.offsetWidth;
+    const CELL_MARGIN = cellMargin || 3; // 如果無法獲取margin，使用默認值3
+    const GRID_SIZE = 12;
+    const PADDING = CELL_MARGIN; // 使用相同的間距作為padding
+    
+    // 計算總寬度（需要確保與上方的數字行完全一致）
+    const TOTAL_WIDTH = numberRow.offsetWidth;
+    const TOTAL_HEIGHT = TOTAL_WIDTH; // 保持正方形
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', TOTAL_WIDTH);
+    svg.setAttribute('height', TOTAL_HEIGHT);
+    svg.setAttribute('viewBox', `0 0 ${TOTAL_WIDTH} ${TOTAL_HEIGHT}`);
+    
+    // 調整容器樣式以確保對齊
+    gridContainer.style.width = `${TOTAL_WIDTH}px`;
+    gridContainer.style.marginTop = '8px';
+    gridContainer.style.display = 'flex';
+    gridContainer.style.justifyContent = 'flex-start'; // 確保左對齊
+
+    // 繪製網格背景
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', i * (CELL_SIZE + CELL_MARGIN));
+            rect.setAttribute('y', j * (CELL_SIZE + CELL_MARGIN));
+            rect.setAttribute('width', CELL_SIZE);
+            rect.setAttribute('height', CELL_SIZE);
+            rect.setAttribute('fill', '#f1f5f9');
+            rect.setAttribute('rx', '4');
+            svg.appendChild(rect);
+        }
+    }
+
+    // 記錄點的位置並畫線
+    const points = [];
+    sumSequence.forEach((value, index) => {
+        const x = index * (CELL_SIZE + CELL_MARGIN) + CELL_SIZE / 2;
+        const y = (12 - value) * (CELL_SIZE + CELL_MARGIN) + CELL_SIZE / 2;
+        points.push({ x, y });
+    });
+
+    // 找出相同 Y 值的點並繪製水平連線
+    function findAndDrawHorizontalConnections() {
+        // 創建一個以 Y 座標為鍵的映射
+        const sameYPoints = {};
+        points.forEach((point, index) => {
+            const y = point.y;
+            if (!sameYPoints[y]) {
+                sameYPoints[y] = [];
+            }
+            sameYPoints[y].push({x: point.x, index: index});
+        });
+
+        // 為每組相同 Y 值的點創建水平連線
+        Object.entries(sameYPoints).forEach(([y, points]) => {
+            if (points.length >= 2) {
+                // 按 X 座標排序點
+                points.sort((a, b) => a.x - b.x);
+                
+                // 對每對連續的點創建連線
+                for (let i = 0; i < points.length - 1; i++) {
+                    const horizontalLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    horizontalLine.setAttribute('d', `M${points[i].x},${y} L${points[i + 1].x},${y}`);
+                    horizontalLine.setAttribute('stroke', '#ef4444'); // 使用紅色來區分
+                    horizontalLine.setAttribute('stroke-width', '2');
+                    horizontalLine.setAttribute('stroke-dasharray', '4,4'); // 虛線效果
+                    svg.appendChild(horizontalLine);
+                }
+            }
+        });
+    }
+
+    // 繪製主要的折線
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const pathD = points.map((p, i) => 
+        (i === 0 ? 'M' : 'L') + `${p.x},${p.y}`
+    ).join(' ');
+    
+    path.setAttribute('d', pathD);
+    path.setAttribute('stroke', '#2563eb');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('fill', 'none');
+    svg.appendChild(path);
+
+    // 添加水平連線
+    findAndDrawHorizontalConnections();
+
+    // 添加點（確保點在最上層）
+    points.forEach(({ x, y }) => {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', '4');
+        circle.setAttribute('fill', '#2563eb');
+        svg.appendChild(circle);
+    });
+
+    gridContainer.appendChild(svg);
+
     // Add fade-in effect
     container.classList.add('fade-in');
     additionalContainer.classList.add('fade-in');
