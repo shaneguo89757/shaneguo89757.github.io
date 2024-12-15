@@ -248,6 +248,30 @@ function generateSequences() {
 
     gridContainer.appendChild(svg);
 
+    // 添加 Y 軸刻度（從下往上 1-12）
+    for (let i = 0; i < GRID_SIZE; i++) {
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', (CELL_SIZE + CELL_MARGIN) / 2 - 6);  // 向左偏移一點
+        text.setAttribute('y', (GRID_SIZE - i - 0.5) * (CELL_SIZE + CELL_MARGIN));
+        text.setAttribute('fill', '#94a3b8');  // 使用淡灰色
+        text.setAttribute('font-size', '12');
+        text.textContent = i + 1;
+        svg.appendChild(text);
+    }
+
+    // 修改 X 軸刻度，放在網格內部第一行
+    for (let i = 0; i < GRID_SIZE; i++) {
+        if (i==0) continue;
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', i * (CELL_SIZE + CELL_MARGIN) + CELL_SIZE / 2);
+        text.setAttribute('y', (GRID_SIZE - 1) * (CELL_SIZE + CELL_MARGIN) + CELL_SIZE / 2 + 5); // 放在第一行
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('fill', '#94a3b8');
+        text.setAttribute('font-size', '12');
+        text.textContent = i + 1;
+        svg.appendChild(text);
+    }
+
     // Add fade-in effect
     container.classList.add('fade-in');
     additionalContainer.classList.add('fade-in');
