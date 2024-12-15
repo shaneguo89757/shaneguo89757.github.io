@@ -272,6 +272,38 @@ function generateSequences() {
         svg.appendChild(text);
     }
 
+    // 在 points 處理之前，先計算當前年齡所在的行數和對應的數字範圍
+    const currentAge = calculateAge(birthDate, currentDate);
+    const rowIndex = Math.floor((currentAge - 1) / 12); // 計算在第幾行（0-based）
+    const startNumber = rowIndex * 12 + 1; // 該行的起始數字
+
+    // 在添加點的部分之後，加上標籤
+    points.forEach(({ x, y }, index) => {
+        // 先畫點
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', '4');
+        circle.setAttribute('fill', '#2563eb');
+        svg.appendChild(circle);
+
+        // 添加數字標籤
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        const number = startNumber + index; // 計算對應的數字
+
+        // 根據點的位置調整標籤位置，避免重疊
+        let labelX = x + 10; // 默認在點的右側
+        let labelY = y - 5;  // 默認在點的上方
+        
+        label.setAttribute('x', labelX);
+        label.setAttribute('y', labelY);
+        label.setAttribute('fill', '#2563eb');
+        label.setAttribute('font-size', '12');
+        label.setAttribute('text-anchor', 'start');
+        label.textContent = number;
+        svg.appendChild(label);
+    });
+
     // Add fade-in effect
     container.classList.add('fade-in');
     additionalContainer.classList.add('fade-in');
