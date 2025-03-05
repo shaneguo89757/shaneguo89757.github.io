@@ -40,8 +40,16 @@ document.getElementById('dayInput').oninput = function() {
     }
 };
 
+// 在文件開頭添加 nameInput 的事件處理
+document.getElementById('nameInput').onkeydown = function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('yearInput').focus();
+    }
+};
+
 // 生成序列的主要函數
 function generateSequences() {
+    const name = document.getElementById('nameInput').value.trim();
     const year = parseInt(document.getElementById('yearInput').value);
     const month = parseInt(document.getElementById('monthInput').value);
     const day = parseInt(document.getElementById('dayInput').value);
@@ -57,7 +65,9 @@ function generateSequences() {
 
     const zodiac = getChineseZodiac(year);
     const weekdayName = getWeekdayName(weekday);
-    document.getElementById('infoText').textContent = `星期${weekdayName}、生肖：${zodiac}`;
+    // 修改資訊顯示，加入名字
+    const nameDisplay = name ? `${name}，` : '';
+    document.getElementById('infoText').textContent = `${nameDisplay}星期${weekdayName}、生肖：${zodiac}`;
 
     const container = document.getElementById('sequenceContainer');
     container.innerHTML = '';
