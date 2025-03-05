@@ -87,12 +87,12 @@
         .fade-in {
             animation: fadeIn 0.5s ease-out;
         }
-        input[type="number"] {
+        input[type="number"], input[type="text"] {
             background-color: #f1f5f9;
             border: 2px solid #e2e8f0;
             transition: all 0.3s ease;
         }
-        input[type="number"]:focus {
+        input[type="number"]:focus, input[type="text"]:focus {
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
         }
@@ -137,8 +137,11 @@
 <body class="font-sans">
     <div class="container mx-auto px-2 py-4">
         <div id="captureArea" class="card relative bg-white shadow-md rounded-lg p-6">
-            <div class="flex flex-wrap justify-center mb-4">
+            <div class="flex justify-start mb-2">
                 <input type="text" id="nameInput" placeholder="姓名" class="m-1 p-2 rounded-lg w-28 text-center text-lg focus:outline-none" maxlength="20">
+            </div>
+            
+            <div class="flex flex-wrap justify-start mb-4">
                 <input type="number" id="yearInput" placeholder="西元年" class="m-1 p-2 rounded-lg w-28 text-center text-lg focus:outline-none" inputmode="numeric" pattern="\d*">
                 <input type="number" id="monthInput" placeholder="月" min="1" max="12" class="m-1 p-2 rounded-lg w-20 text-center text-lg focus:outline-none" inputmode="numeric" pattern="\d*">
                 <input type="number" id="dayInput" placeholder="日" min="1" max="31" class="m-1 p-2 rounded-lg w-20 text-center text-lg focus:outline-none" inputmode="numeric" pattern="\d*">
